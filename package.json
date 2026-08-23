@@ -1,0 +1,11 @@
+{
+  "name": "omar-sherif-cv",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Omar Sherif — CV / resume website (PADI Instructor & Dive Master).",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  },
+  "license": "UNLICENSED"
+}
