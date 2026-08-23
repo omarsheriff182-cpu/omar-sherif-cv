@@ -18,7 +18,7 @@
 
 const CV = {
   meta: {
-    siteName: "Omar Sherif | PADI Instructor & Dive Master",
+    siteName: "Omar Sherif | PADI Instructor",
   },
 
   brand: {
@@ -37,10 +37,10 @@ const CV = {
   },
 
   hero: {
-    eyebrow: "PADI Instructor & Dive Master",
+    eyebrow: "PADI Instructor",
     name: "Omar Sherif El-saied",
     tagline:
-      "Experienced dive guide specializing in leading diverse dive groups, sharing marine knowledge, and mentoring divers at every level — committed to responsible diving and environmental conservation.",
+      "",
     location: "Maadi, Cairo, Egypt",
     portrait: {
       src: "assets/img/portrait.jpg",
@@ -54,7 +54,8 @@ const CV = {
     eyebrow: "About Me",
     title: "About Me",
     paragraphs: [
-      "Experienced Dive Guide specializing in leading diverse dive groups, ensuring safety, and sharing marine knowledge. Committed to responsible diving and environmental conservation.",
+      "Dedicated PADI Scuba Diving Instructor with 4+ years of professional experience guiding diverse groups and teaching all levels. Passionate about marine education, diver mentorship, and promoting eco-friendly, responsible diving practices. Skilled in safety management, dive planning, and delivering unforgettable underwater experiences.
+.",
       "Successfully completed the PADI Instructor Development Course (IDC) and further developed professional-level teaching and leadership skills. Eager to contribute to sustainable dive experiences while mentoring and inspiring divers at all levels.",
     ],
     interests: ["Volunteer work", "Inspiration", "Physical activities", "Music", "Photography", "Social causes"],
@@ -182,6 +183,6 @@ const CV = {
   },
 
   footer: {
-    tagline: "PADI Instructor & Dive Master",
+    tagline: "PADI Instructor",
   },
 };
