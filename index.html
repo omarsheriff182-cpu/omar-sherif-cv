@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Omar Sherif | PADI Instructor & Dive Master</title>
-<meta name="description" content="Omar Sherif — PADI Instructor and Dive Master based in Egypt. Diving experience across El Qusier, Marsa Alam, Makadi Bay and Sharm El Sheikh, plus graphic design and motion editing work." />
+<title>Omar Sherif | PADI Scuba Diving Instructor</title>
+<meta name="description" content="Omar Sherif — PADI Scuba Diving Instructor based in Egypt. Diving experience across El Qusier, Marsa Alam, Makadi Bay and Sharm El Sheikh, plus graphic design and motion editing work." />
 <meta name="keywords" content="Omar Sherif, PADI Instructor, Dive Master, Red Sea diving, Egypt diving instructor, graphic designer, motion designer" />
 
 <link rel="canonical" href="https://YOUR-DOMAIN-HERE.com/" />
 
 <!-- Open Graph -->
-<meta property="og:title" content="Omar Sherif | PADI Instructor & Dive Master" />
-<meta property="og:description" content="PADI Instructor and Dive Master based in Egypt — CV, diving experience, certifications and creative work." />
+<meta property="og:title" content="Omar Sherif | PADI Scuba Diving Instructor" />
+<meta property="og:description" content="PADI Scuba Diving Instructor based in Egypt — CV, diving experience, certifications and creative work." />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:image" content="assets/img/portrait.jpg" />
 <meta property="og:url" content="https://YOUR-DOMAIN-HERE.com/" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Omar Sherif | PADI Instructor & Dive Master" />
-<meta name="twitter:description" content="PADI Instructor and Dive Master based in Egypt — CV, diving experience, certifications and creative work." />
+<meta name="twitter:title" content="Omar Sherif | PADI Scuba Diving Instructor" />
+<meta name="twitter:description" content="PADI Scuba Diving Instructor based in Egypt — CV, diving experience, certifications and creative work." />
 <meta name="twitter:image" content="assets/img/portrait.jpg" />
 
 <script type="application/ld+json">
@@ -27,7 +27,7 @@
   "@context": "https://schema.org",
   "@type": "Person",
   "name": "Omar Sherif El-saied",
-  "jobTitle": "PADI Instructor & Dive Master",
+  "jobTitle": "PADI Scuba Diving Instructor",
   "description": "Experienced dive guide and PADI Instructor based in Egypt, with a background in graphic design and motion editing.",
   "image": "assets/img/portrait.jpg",
   "email": "mailto:omar.sheriff182@gmail.com",
@@ -51,6 +51,23 @@
 
 <div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel"></span></div>
 
+<!-- Audio ON/OFF — ambient underwater tone, synthesized in-browser (no
+     external audio file, so nothing to fail to load after deployment).
+     Never autoplays; only starts after this button is clicked. -->
+<button class="audio-toggle" id="audioToggle" aria-pressed="false" aria-label="Turn ambient underwater sound on">
+  <span class="audio-toggle__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path id="audioWave1" d="M16 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path id="audioWave2" d="M18.5 6.5a8 8 0 0 1 0 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/></svg>
+  </span>
+  <span id="audioToggleLabel">Sound Off</span>
+</button>
+
+<!-- Simulated visitor counter — clearly not real analytics (see script.js,
+     initVisitorCounter, for exactly how the number is produced). -->
+<div class="visitor-counter" id="visitorCounter" aria-live="polite">
+  <span class="visitor-counter__dot" aria-hidden="true"></span>
+  <span id="visitorCounterText"></span>
+</div>
+
 <header class="nav" id="nav">
   <a class="nav__mark" href="#top" id="navMark"></a>
   <button class="nav__toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
@@ -63,7 +80,18 @@
 
   <!-- HERO -->
   <section class="hero" id="hero">
-    <div class="hero__bg" aria-hidden="true"><span class="hero__glow"></span></div>
+    <!-- Cinematic underwater atmosphere: canvas particles + CSS light
+         rays/caustics + drifting marine-life silhouettes. Confined to the
+         hero so the rest of the CV stays on simple, fast, readable solid
+         backgrounds. Density scales down on small screens and the whole
+         layer goes still if the visitor has prefers-reduced-motion set. -->
+    <div class="ocean" id="ocean" aria-hidden="true">
+      <canvas id="oceanCanvas"></canvas>
+      <div class="ocean__rays"></div>
+      <div class="ocean__caustics"></div>
+      <div class="ocean__silhouettes" id="oceanSilhouettes"></div>
+      <span class="hero__glow"></span>
+    </div>
     <div class="container hero__inner">
       <div class="hero__portrait reveal">
         <div class="hero__portrait-frame">
@@ -90,17 +118,6 @@
       </div>
       <div class="about__body reveal" id="aboutBody"></div>
       <div class="about__interests reveal" id="aboutInterests"></div>
-    </div>
-  </section>
-
-  <!-- PROFESSIONAL EXPERIENCE -->
-  <section class="section section--deep" id="experience">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow" id="experienceEyebrow"></span>
-        <h2 class="display-2" id="experienceTitle"></h2>
-      </div>
-      <div class="timeline" id="experienceTimeline"></div>
     </div>
   </section>
 

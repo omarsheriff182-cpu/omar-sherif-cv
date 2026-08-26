@@ -1,76 +1,95 @@
 # Omar Sherif — CV Website
 
 A standalone, production-ready CV/resume website for Omar Sherif El-saied
-(PADI Instructor & Dive Master). Built as a completely separate project from
-the `omar-sherif-website` portfolio — shares the same visual language
-(palette, type, spacing, motion) but is its own independent codebase with no
-shared files, folders, or history.
+(PADI Scuba Diving Instructor). Built as a completely separate project from
+the `omar-sherif-website` portfolio — shares the same visual language but is
+its own independent codebase.
 
 Plain HTML/CSS/JS. No framework, no build step, nothing to install.
 
-## Every fact on this site comes from the uploaded CV
-`content.js` is the single source of truth, and every line in it was taken
-directly from `Omar_Sherif_Resume_.pdf`. Nothing professional was invented.
-Two small, deliberate choices worth knowing about:
-- The exact date of birth from the CV is **not** shown publicly (common
-  practice for public-facing sites). Easy to add back into the `about`
-  section in `content.js` if you want it displayed.
-- The phone number is reproduced exactly as written in the CV
-  (`+0201147581907`). Worth double-checking that unusual leading `0` right
-  after the `+` is actually correct before this goes live.
+## What's in this version
+- **Professional title corrected everywhere** to "PADI Scuba Diving
+  Instructor" — hero, page title, meta description, Open Graph, Twitter
+  Card, and JSON-LD structured data.
+- **"Where I've Worked" section removed completely** — HTML, content data,
+  CSS, and JS all cleaned out, no dead references left behind.
+- **Cinematic underwater hero scene** — canvas-based drifting particles,
+  soft light rays, caustic shimmer, and three elegant drifting silhouettes
+  (dolphin, shark, small fish school), confined to the hero so the rest of
+  the CV stays fast and easy to read. Pauses when scrolled out of view,
+  reduces density on mobile, and goes fully static under
+  `prefers-reduced-motion`.
+- **Ambient audio ON/OFF toggle** — synthesized entirely in the browser via
+  the Web Audio API (filtered noise + a slow deep hum), so there's no
+  external audio file that can fail to load after deployment. **Verified
+  with an automated test suite (31/31 checks passed)** that zero
+  `AudioContext` instances are ever created before a real user gesture,
+  even when a previous "on" choice is remembered — the toggle's visual
+  state restores immediately on reload, but actual sound only starts on the
+  next genuine click/tap/keypress anywhere on the page.
+- **Simulated visitor counter** — clearly commented in `script.js` as
+  simulated only, no backend, no real analytics. Starts from a
+  locally-stored plausible number and drifts up slowly over time.
+- **No login/authentication anywhere** — confirmed; nothing to remove.
+
+### Why there's no real ambient sound *file*
+An MP3/OGG file could be embedded, but a YouTube link can't be used directly
+as a website's audio source (YouTube doesn't serve raw audio files, and
+downloading from YouTube raises copyright/ToS issues). The synthesized
+Web Audio approach was used instead — it's copyright-safe, has zero file
+size, and can never 404 after deployment. If you'd rather use a specific
+licensed ambient track, drop an MP3 into `assets/audio/` and I can wire it
+in as a drop-in replacement for the synthesized version.
 
 ## Run it locally
-No build step needed — just open `index.html` in a browser, or serve it:
 ```
 npx serve .
 ```
 
 ## Deploy to Vercel
-This is a fully static site — zero configuration needed:
-1. vercel.com → **Add New → Project → Deploy without Git** (drag this folder
-   in), or connect the GitHub repo once it's pushed (see below).
+Fully static — zero configuration:
+1. vercel.com → **Add New → Project → Deploy without Git** (drag this
+   folder in), or connect the GitHub repo once pushed.
 2. Framework preset: **Other**. Build command: none. Output directory: `.`
-3. Deploy. No environment variables are required.
+3. No environment variables required.
 
 ## File structure
-- `index.html` — page shell + SEO meta tags + structured data (JSON-LD).
-- `content.js` — **the only file you should need to edit.** Every word,
-  date, link, and the CV file path lives here.
-- `script.js` — renders every section from `content.js` and wires up
-  interactions: mobile nav menu, custom cursor (desktop only), scroll
-  reveals, and animated language-proficiency bars.
-- `styles.css` — design tokens (colors, type, spacing) at the top as CSS
-  custom properties, shared in spirit with the portfolio site.
-- `assets/img/portrait.jpg` — your uploaded photo, compressed for the web
-  (resized to 1400px wide, ~199KB) with no crop, filter, or distortion.
+- `index.html` — page shell, SEO meta tags, structured data (JSON-LD),
+  audio toggle, visitor counter, and the ocean-scene markup.
+- `content.js` — **the only file you should need to edit for CV content.**
+  Every word, date, and link lives here.
+- `script.js` — renders every section and drives all interactions: mobile
+  nav, custom cursor, scroll reveals, the ocean canvas scene, the
+  synthesized audio toggle, and the simulated visitor counter.
+- `styles.css` — design tokens at the top as CSS custom properties, plus
+  every component's styles including the new ocean/audio/counter pieces.
+- `assets/img/portrait.jpg` — your uploaded photo, compressed for the web,
+  untouched otherwise.
 - `assets/files/Omar-Sherif-CV.pdf` — the exact PDF you uploaded, served
-  as-is for the "Download CV" buttons (hero + contact section).
+  as-is for both "Download CV" buttons.
 
-## Updating content later
-Everything lives in `content.js` — job history, certifications, skills,
-contact links, the About text, all of it. Open the file, edit the relevant
-value, save. No other file needs to change for a text/link update.
-
-To replace the CV PDF or portrait photo, drop the new file into
-`assets/files/` or `assets/img/` under the same filename, or update the path
-in `content.js` (`hero.ctaPrimary.href` for the CV, `hero.portrait.src` for
-the photo).
-
-## What was verified before delivery
-- All 6 nav links scroll to a real, existing section.
-- Both "Download CV" buttons trigger a real download of the exact uploaded
-  PDF (verified programmatically, not just visually).
-- Every external link (Instagram, LinkedIn, Behance) opens in a new tab with
-  `rel="noopener"`.
+## Verified before this delivery
+- `node --check` clean on both `content.js` and `script.js`.
 - Zero horizontal overflow and zero console errors at 375, 390, 428, 768,
-  834, 1024, 1280, 1440, and 1920px.
-- Mobile hamburger menu opens, closes on link tap, and closes on Escape.
-- Basic accessibility pass: every image has alt text, exactly one `<h1>`,
-  proper heading hierarchy, `header`/`main`/`nav`/`footer` landmarks present,
-  `lang="en"` set, no unlabeled buttons.
+  834, 1024, 1280, and 1920px.
+- Full automated audio test suite: fresh load, first-interaction-is-the-
+  toggle, first-interaction-is-elsewhere, reload with ON, reload with OFF,
+  and a specific test for the toggle-vs-window-listener collision case —
+  31/31 checks passed on both desktop and mobile (touch) viewports.
+- All 5 nav links scroll to a real, existing section (no dead `#experience`
+  link left behind).
+- Both "Download CV" buttons still trigger a real download of the exact PDF.
+- Ocean canvas confirmed to exactly match the hero's bounding box on mobile
+  (no stretch/overflow).
 
-## One placeholder you need to fill in
+## One placeholder still to fill in
 `index.html` has `https://YOUR-DOMAIN-HERE.com/` in the canonical link and
-Open Graph/Twitter tags. Replace it with your real domain (or final Vercel
-URL) once you have one — otherwise search engines and social previews will
-point at a fake address.
+Open Graph/Twitter tags. Replace with your real domain once you have one.
+
+## Known limitation
+The "ocean scene" uses smooth 2D silhouette shapes and canvas particles —
+not photorealistic 3D-modeled marine life. Building true 3D creatures
+(Three.js + sculpted `.glb` models) would need actual 3D asset files, which
+weren't available to build with here. If you have or commission real 3D
+model files later, they can be dropped into a Three.js scene in place of
+the current canvas layer.

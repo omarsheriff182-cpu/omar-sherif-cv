@@ -93,21 +93,6 @@
     CV.about.interests.forEach((i) => interests.appendChild(el("span", "pill", i)));
   }
 
-  function renderExperience() {
-    $("experienceEyebrow").textContent = CV.experience.eyebrow;
-    $("experienceTitle").textContent = CV.experience.title;
-    const timeline = $("experienceTimeline");
-    CV.experience.roles.forEach((r) => {
-      const item = el("div", "timeline__item reveal");
-      const period = el("span", "timeline__period", r.period);
-      const body = el("div");
-      body.appendChild(el("h3", "timeline__title", r.title));
-      body.appendChild(el("p", "timeline__meta", `${r.org} — ${r.location}`));
-      item.append(period, body);
-      timeline.appendChild(item);
-    });
-  }
-
   function renderDiving() {
     $("divingEyebrow").textContent = CV.diving.eyebrow;
     $("divingTitle").textContent = CV.diving.title;
@@ -315,12 +300,305 @@
     items.forEach((item) => io.observe(item));
   }
 
+  /* ============================================================
+     OCEAN SCENE — canvas particles + drifting marine-life
+     silhouettes, confined to the hero. Pauses when the hero is
+     scrolled out of view and goes fully static under
+     prefers-reduced-motion.
+     ============================================================ */
+  function initOceanScene() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canvas = $("oceanCanvas");
+    const hero = $("hero");
+    if (!canvas || !hero) return;
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let raf = null;
+    let visible = true;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      const w = hero.clientWidth;
+      const h = hero.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const isMobile = w < 640;
+      const density = isMobile ? 26000 : 15000;
+      const count = Math.round((w * h) / density);
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.8 + 0.5,
+        speed: Math.random() * 0.35 + 0.08,
+        drift: (Math.random() - 0.5) * 0.15,
+        o: Math.random() * 0.5 + 0.15,
+      }));
+    }
+
+    function draw() {
+      const w = hero.clientWidth;
+      const h = hero.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach((p) => {
+        p.y -= p.speed;
+        p.x += p.drift;
+        if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(180, 226, 220, ${p.o})`;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      if (visible && !reduceMotion) raf = requestAnimationFrame(draw);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    if (!reduceMotion) {
+      const io = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && !raf) draw();
+      });
+      io.observe(hero);
+      draw();
+    } else {
+      // Still render one static frame so the hero doesn't look empty.
+      draw();
+    }
+
+    buildSilhouettes();
+  }
+
+  // Simple, elegant, low-opacity silhouette shapes — deliberately not
+  // photorealistic 3D models (none are available in this project), but
+  // smooth and recognizable rather than blocky or cartoonish.
+  const SILHOUETTE_PATHS = {
+    dolphin:
+      '<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M10,52 C30,22 72,10 102,20 C120,26 130,15 142,9 C134,22 129,30 131,36 C152,39 172,48 192,46 C172,54 151,59 133,57 C138,66 144,74 152,81 C132,75 117,64 109,55 C90,67 58,68 38,60 C54,55 67,48 73,40 C54,45 30,45 10,52 Z"/></svg>',
+    shark:
+      '<svg viewBox="0 0 220 90" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M4,56 C42,30 92,19 142,25 C161,14 176,5 186,8 C179,18 173,26 173,32 C192,36 209,44 218,50 C200,55 182,55 168,50 C171,60 177,70 187,79 C169,73 155,62 149,53 C120,63 79,65 49,58 C60,52 68,46 72,40 C50,45 24,49 4,56 Z"/></svg>',
+    school:
+      '<svg viewBox="0 0 160 60" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><path d="M6,30 C10,22 22,22 26,30 C22,38 10,38 6,30 Z"/><path d="M40,18 C44,10 56,10 60,18 C56,26 44,26 40,18 Z"/><path d="M46,42 C50,34 62,34 66,42 C62,50 50,50 46,42 Z"/><path d="M92,26 C96,18 108,18 112,26 C108,34 96,34 92,26 Z"/><path d="M120,10 C124,2 136,2 140,10 C136,18 124,18 120,10 Z"/></g></svg>',
+  };
+
+  function buildSilhouettes() {
+    const host = $("oceanSilhouettes");
+    if (!host || host.childElementCount) return;
+    const configs = [
+      { type: "dolphin", cls: "", top: "18%", w: 130, h: 65, duration: 46, delay: -6, reverse: false },
+      { type: "shark", cls: " ocean__silhouette--secondary", top: "52%", w: 150, h: 62, duration: 58, delay: -20, reverse: true },
+      { type: "school", cls: " ocean__silhouette--tertiary", top: "34%", w: 110, h: 42, duration: 38, delay: -12, reverse: false },
+    ];
+    configs.forEach((c) => {
+      const wrap = document.createElement("div");
+      wrap.className = `ocean__silhouette${c.cls}`;
+      wrap.style.top = c.top;
+      wrap.style.width = c.w + "px";
+      wrap.style.height = c.h + "px";
+      wrap.style.animationDuration = c.duration + "s";
+      wrap.style.animationDelay = c.delay + "s";
+      wrap.style.animationName = c.reverse ? "driftAcrossReverse" : "driftAcross";
+      wrap.innerHTML = SILHOUETTE_PATHS[c.type];
+      host.appendChild(wrap);
+    });
+  }
+
+  /* ============================================================
+     AMBIENT AUDIO — synthesized entirely in-browser via the Web
+     Audio API (filtered noise + a slow, deep oscillator), so
+     there's no external audio file that can go missing or fail
+     to load after deployment. Never autoplays: audio only ever
+     starts inside a real user-gesture handler.
+     ============================================================ */
+  const AUDIO_PREF_KEY = "omarcv_audio_pref";
+  let audioCtx = null;
+  let audioNodes = null;
+  let audioIsOn = false;
+
+  function buildAudioGraph(ctx) {
+    // Filtered brown-noise bed for a soft underwater "whoosh".
+    const bufferSize = ctx.sampleRate * 2;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      last = (last + 0.02 * white) / 1.02;
+      data[i] = last * 3.5;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = "lowpass";
+    noiseFilter.frequency.value = 400;
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0.05;
+
+    // A slow, deep hum for underwater depth.
+    const hum = ctx.createOscillator();
+    hum.type = "sine";
+    hum.frequency.value = 60;
+    const humGain = ctx.createGain();
+    humGain.gain.value = 0.02;
+
+    // Slow LFO breathing the filter for a natural, non-static feel.
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.06;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 120;
+    lfo.connect(lfoGain);
+    lfoGain.connect(noiseFilter.frequency);
+
+    const master = ctx.createGain();
+    master.gain.value = 0; // ramped up only after an explicit user click
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(master);
+    hum.connect(humGain);
+    humGain.connect(master);
+    master.connect(ctx.destination);
+
+    noise.start();
+    hum.start();
+    lfo.start();
+
+    return { master, noise, hum, lfo };
+  }
+
+  function setAudioUI(on) {
+    const btn = $("audioToggle");
+    const label = $("audioToggleLabel");
+    btn.classList.toggle("is-on", on);
+    btn.setAttribute("aria-pressed", String(on));
+    btn.setAttribute("aria-label", on ? "Turn ambient underwater sound off" : "Turn ambient underwater sound on");
+    label.textContent = on ? "Sound On" : "Sound Off";
+  }
+
+  function turnAudioOn() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return; // Web Audio unsupported — button stays a harmless no-op.
+      audioCtx = new AC();
+      audioNodes = buildAudioGraph(audioCtx);
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const now = audioCtx.currentTime;
+    audioNodes.master.gain.cancelScheduledValues(now);
+    audioNodes.master.gain.setValueAtTime(audioNodes.master.gain.value, now);
+    audioNodes.master.gain.linearRampToValueAtTime(1, now + 0.8);
+    audioIsOn = true;
+    setAudioUI(true);
+    try { localStorage.setItem(AUDIO_PREF_KEY, "on"); } catch (e) {}
+  }
+
+  function turnAudioOff() {
+    audioIsOn = false;
+    setAudioUI(false);
+    try { localStorage.setItem(AUDIO_PREF_KEY, "off"); } catch (e) {}
+    if (!audioCtx || !audioNodes) return;
+    const now = audioCtx.currentTime;
+    audioNodes.master.gain.cancelScheduledValues(now);
+    audioNodes.master.gain.setValueAtTime(audioNodes.master.gain.value, now);
+    audioNodes.master.gain.linearRampToValueAtTime(0, now + 0.4);
+  }
+
+  function initAudio() {
+    const btn = $("audioToggle");
+    if (!btn) return;
+
+    let storedPref = null;
+    try { storedPref = localStorage.getItem(AUDIO_PREF_KEY); } catch (e) {}
+
+    let armedListeners = [];
+    function disarmAutoStart() {
+      armedListeners.forEach(([evt, fn]) => window.removeEventListener(evt, fn));
+      armedListeners = [];
+    }
+
+    btn.addEventListener("click", () => {
+      // An explicit click on the toggle is the user's own decision — it
+      // always wins, so cancel any pending "resume on next interaction"
+      // listener to avoid the two colliding on this same click.
+      disarmAutoStart();
+      if (audioIsOn) turnAudioOff();
+      else turnAudioOn();
+    });
+
+    if (storedPref === "on") {
+      // Reflect the remembered choice in the UI immediately on load —
+      // this does NOT create an AudioContext or play anything yet, it's
+      // purely visual until a genuine user gesture occurs.
+      audioIsOn = true;
+      setAudioUI(true);
+
+      // On the next real interaction anywhere on the page (other than the
+      // toggle itself, which is handled above), actually start the audio.
+      // Still a genuine user gesture — never true autoplay.
+      const armOnce = (e) => {
+        if (e.target && e.target.closest && e.target.closest("#audioToggle")) return;
+        disarmAutoStart();
+        turnAudioOn();
+      };
+      ["pointerdown", "keydown", "touchstart"].forEach((evt) => {
+        window.addEventListener(evt, armOnce, { once: true, passive: true });
+        armedListeners.push([evt, armOnce]);
+      });
+    }
+  }
+
+  /* ============================================================
+     VISITOR COUNTER — SIMULATED ONLY. This is not connected to
+     any real analytics or backend. It shows a plausible, slowly
+     drifting number so the page feels alive, and nothing more.
+     ============================================================ */
+  const VISITOR_BASE_KEY = "omarcv_visitor_base";
+
+  function initVisitorCounter() {
+    const el = $("visitorCounterText");
+    if (!el) return;
+
+    let base;
+    try {
+      const stored = localStorage.getItem(VISITOR_BASE_KEY);
+      base = stored ? parseInt(stored, 10) : null;
+    } catch (e) {
+      base = null;
+    }
+    if (!base || Number.isNaN(base)) {
+      base = 24 + Math.floor(Math.random() * 40); // plausible starting figure
+      try { localStorage.setItem(VISITOR_BASE_KEY, String(base)); } catch (e) {}
+    }
+
+    let current = base;
+    const render = () => { el.textContent = `${current} people have viewed this CV`; };
+    render();
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return; // number still shown, just doesn't drift
+
+    setInterval(() => {
+      if (Math.random() < 0.6) {
+        current += 1;
+        try { localStorage.setItem(VISITOR_BASE_KEY, String(current)); } catch (e) {}
+        render();
+      }
+    }, 9000 + Math.random() * 6000);
+  }
+
   function init() {
     document.title = CV.meta.siteName;
     renderNav();
     renderHero();
     renderAbout();
-    renderExperience();
     renderDiving();
     renderCertifications();
     renderSkills();
@@ -334,6 +612,9 @@
     initMobileNav();
     initCursor();
     initReveals();
+    initOceanScene();
+    initAudio();
+    initVisitorCounter();
   }
 
   if (document.readyState === "loading") {

@@ -3,7 +3,10 @@
  * OMAR SHERIF — CV CONTENT
  * ============================================================
  * Every fact here comes directly from the uploaded resume
- * (Omar_Sherif_Resume_.pdf). Nothing professional was invented.
+ * (Omar_Sherif_Resume_.pdf) plus the professional-title update
+ * Omar requested directly (PADI Scuba Diving Instructor, PADI
+ * Instructor certification dated 02/2026). Nothing else was
+ * invented.
  *
  * A couple of small, deliberate choices worth knowing about:
  * - Exact date of birth from the CV is NOT displayed publicly
@@ -18,7 +21,7 @@
 
 const CV = {
   meta: {
-    siteName: "Omar Sherif | PADI Instructor",
+    siteName: "Omar Sherif | PADI Scuba Diving Instructor",
   },
 
   brand: {
@@ -28,7 +31,6 @@ const CV = {
   nav: {
     links: [
       { label: "About", href: "#about" },
-      { label: "Experience", href: "#experience" },
       { label: "Diving", href: "#diving" },
       { label: "Skills", href: "#skills" },
       { label: "Education", href: "#education" },
@@ -37,10 +39,10 @@ const CV = {
   },
 
   hero: {
-    eyebrow: "PADI Instructor",
+    eyebrow: "PADI Scuba Diving Instructor",
     name: "Omar Sherif El-saied",
     tagline:
-      "",
+      "PADI Scuba Diving Instructor with 4+ years guiding divers across the Red Sea — passionate about marine education, diver mentorship, and safe, responsible, unforgettable underwater experiences.",
     location: "Maadi, Cairo, Egypt",
     portrait: {
       src: "assets/img/portrait.jpg",
@@ -54,24 +56,10 @@ const CV = {
     eyebrow: "About Me",
     title: "About Me",
     paragraphs: [
-      "Dedicated PADI Scuba Diving Instructor with 4+ years of professional experience guiding diverse groups and teaching all levels. Passionate about marine education, diver mentorship, and promoting eco-friendly, responsible diving practices. Skilled in safety management, dive planning, and delivering unforgettable underwater experiences.
-.",
+      "Dedicated PADI Scuba Diving Instructor with 4+ years of professional experience guiding diverse groups and teaching all levels. Passionate about marine education, diver mentorship, and promoting eco-friendly, responsible diving practices. Skilled in safety management, dive planning, and delivering unforgettable underwater experiences.",
       "Successfully completed the PADI Instructor Development Course (IDC) and further developed professional-level teaching and leadership skills. Eager to contribute to sustainable dive experiences while mentoring and inspiring divers at all levels.",
     ],
     interests: ["Volunteer work", "Inspiration", "Physical activities", "Music", "Photography", "Social causes"],
-  },
-
-  // Compact reverse-chronological overview of every role on the CV.
-  experience: {
-    eyebrow: "Professional Experience",
-    title: "Where I've Worked",
-    roles: [
-      { title: "Dive Master", org: "Ducks Diving Center", location: "El Qusier", period: "05/2025 — Present" },
-      { title: "Dive Master", org: "Freelancer", location: "Marsa Alam", period: "07/2024 — 05/2025" },
-      { title: "Dive Master", org: "Dive Red Sea", location: "Makadi Bay", period: "04/2024 — 07/2024" },
-      { title: "Graphic Designer / Motion Designer / Video Editor", org: "Plus One Up", location: "Cairo", period: "05/2020 — Present" },
-      { title: "Dive Master", org: "Eazy Divers International", location: "Sharm El Sheikh", period: "08/2021 — 03/2022" },
-    ],
   },
 
   // The diving-specific roles, expanded with detail.
@@ -183,6 +171,6 @@ const CV = {
   },
 
   footer: {
-    tagline: "PADI Instructor",
+    tagline: "PADI Scuba Diving Instructor",
   },
 };
